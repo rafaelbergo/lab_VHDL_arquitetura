@@ -1,18 +1,24 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-    echo "Uso: ./compilar.sh <name>"
+    echo "Uso: ./compiler.sh <name>"
     exit 1
 fi
 
-FILE_NAME="$1"
+TB_FILE="$1"
 
-ghdl -a "${FILE_NAME}.vhd"
-ghdl -e "${FILE_NAME}"
+for FILE in *.vhd; do
+    FILE_NAME="${FILE%.vhd}"
+    
+    ghdl -a "$FILE"
+    ghdl -e "$FILE_NAME"
 
-ghdl -a "${FILE_NAME}_tb.vhd"
-ghdl -e "${FILE_NAME}_tb"
+    if [ -f "${FILE_NAME}_tb.vhd" ]; then
+        ghdl -a "${FILE_NAME}_tb.vhd"
+        ghdl -e "${FILE_NAME}_tb"
+    fi
+done
 
-ghdl -r "${FILE_NAME}_tb" --wave="${FILE_NAME}_tb.ghw"
+ghdl -r "${TB_FILE}_tb" --wave="${TB_FILE}_tb.ghw"
 
-gtkwave "${FILE_NAME}_tb.ghw"
+gtkwave "${TB_FILE}_tb.ghw"
